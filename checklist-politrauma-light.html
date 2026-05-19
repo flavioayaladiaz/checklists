@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist Reanimación Politrauma · HUAP</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f9fc;
+    --surface: #ffffff;
+    --surface2: #f1f4f9;
+    --border: rgba(0,0,0,0.08);
+    --red: #dc2626;
+    --red-glow: rgba(220,38,38,0.10);
+    --amber: #d97706;
+    --amber-glow: rgba(217,119,6,0.10);
+    --emerald: #059669;
+    --emerald-glow: rgba(5,150,105,0.10);
+    --blue: #2563eb;
+    --blue-glow: rgba(37,99,235,0.10);
+    --indigo: #4f46e5;
+    --violet: #7c3aed;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --text-dim: #475569;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --display: 'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(239,68,68,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 110%, rgba(99,102,241,0.04) 0%, transparent 50%);
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* HEADER */
+  .header { margin-bottom: 40px; animation: fadeUp 0.6s ease both; }
+
+  .huap-logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(26px, 5vw, 42px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #0f172a;
+  }
+
+  h1 span {
+    background: linear-gradient(135deg, #ef4444, #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* CLINICAL NOTE */
+  .clinical-update {
+    margin-top: 16px;
+    background: rgba(245,158,11,0.04);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 12.5px;
+    color: #b45309;
+    line-height: 1.6;
+    font-family: var(--mono);
+  }
+
+  .clinical-update strong { color: #fff; }
+
+  /* PROGRESS */
+  .progress-bottom {
+    margin-top: 32px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .progress-bar-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(0,0,0,0.08);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ef4444, #f97316);
+    border-radius: 100px;
+    width: 0%;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 0 12px rgba(239,68,68,0.5);
+  }
+
+  .progress-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  #progress-pct { color: var(--red); font-weight: 500; }
+
+  .reset-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .reset-btn:hover { border-color: rgba(0,0,0,0.2); color: var(--text); }
+
+  /* STATUS BADGE */
+  .status-badge {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: 13px;
+    color: #6ee7b7;
+    font-family: var(--mono);
+    animation: slideIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .status-badge.show { display: flex; }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 20px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    overflow: hidden;
+    transition: box-shadow 0.3s;
+    animation: fadeUp 0.5s ease both;
+  }
+  .section:hover { box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.08); }
+
+  .section:nth-child(1) { animation-delay: 0.1s; }
+  .section:nth-child(2) { animation-delay: 0.15s; }
+  .section:nth-child(3) { animation-delay: 0.2s; }
+  .section:nth-child(4) { animation-delay: 0.25s; }
+  .section:nth-child(5) { animation-delay: 0.3s; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+  .section-header:hover { background: rgba(0,0,0,0.02); }
+  .section.collapsed .section-chevron { transform: rotate(-90deg); }
+  .section.collapsed .section-body { display: none; }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: 100px;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    flex: 1;
+  }
+
+  .section-subtitle { font-size: 12px; color: var(--text-muted); font-family: var(--mono); margin-top: 2px; }
+  .section-chevron { color: var(--text-muted); transition: transform 0.3s; flex-shrink: 0; }
+  .section-body { padding: 20px 24px 24px; }
+
+  .section-check-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: rgba(0,0,0,0.04);
+    border: 1px solid var(--border);
+    padding: 3px 9px;
+    border-radius: 100px;
+    transition: all 0.3s;
+  }
+
+  /* SECTION COLORS */
+  .s1 .section-num { background: rgba(239,68,68,0.15); color: #b91c1c; border: 1px solid rgba(239,68,68,0.2); }
+  .s1 { --accent: var(--red); --accent-glow: var(--red-glow); }
+
+  .s2 .section-num { background: rgba(245,158,11,0.12); color: #b45309; border: 1px solid rgba(245,158,11,0.2); }
+  .s2 { --accent: var(--amber); --accent-glow: var(--amber-glow); }
+
+  .s3 .section-num { background: rgba(59,130,246,0.15); color: #1d4ed8; border: 1px solid rgba(59,130,246,0.2); }
+  .s3 { --accent: var(--blue); --accent-glow: var(--blue-glow); }
+
+  .s4 .section-num { background: rgba(99,102,241,0.12); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.2); }
+  .s4 { --accent: var(--indigo); --accent-glow: rgba(99,102,241,0.12); }
+
+  .s5 .section-num { background: rgba(16,185,129,0.12); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.2); }
+  .s5 { --accent: var(--emerald); --accent-glow: var(--emerald-glow); }
+
+  /* CHECKLIST */
+  .checklist { display: flex; flex-direction: column; gap: 10px; }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .check-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent-glow);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .check-item:hover::before { opacity: 1; }
+  .check-item:hover { border-color: rgba(0,0,0,0.10); }
+
+  .check-item.checked {
+    border-color: rgba(0,0,0,0.08);
+    background: rgba(0,0,0,0.02);
+  }
+  .check-item.checked::before { opacity: 0.5; }
+
+  .checkbox {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--text-muted);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+
+  .check-item.checked .checkbox {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  .checkmark {
+    opacity: 0;
+    transform: scale(0) rotate(-10deg);
+    transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .check-item.checked .checkmark { opacity: 1; transform: scale(1) rotate(0deg); }
+
+  .check-label {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-dim);
+    transition: color 0.2s;
+    position: relative;
+    z-index: 1;
+  }
+
+  .check-item.checked .check-label {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    text-decoration-color: rgba(100,116,139,0.5);
+  }
+
+  .check-label strong { color: #fff; font-weight: 500; }
+
+  /* ROLES GRID */
+  .roles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+  }
+
+  .role-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    transition: all 0.2s;
+  }
+
+  .role-card:hover { border-color: rgba(0,0,0,0.10); transform: translateY(-1px); }
+
+  .role-name {
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .role-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .role-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* ABC SCORE CALC */
+  .abc-box {
+    background: var(--surface2);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+
+  .abc-title {
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 700;
+    color: #b45309;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .abc-items {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .abc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(245,158,11,0.04);
+    border: 1px solid rgba(245,158,11,0.15);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .abc-item:hover { background: rgba(245,158,11,0.12); }
+  .abc-item.active { background: rgba(245,158,11,0.2); border-color: rgba(245,158,11,0.4); }
+
+  .abc-check {
+    width: 20px; height: 20px;
+    border-radius: 5px;
+    border: 2px solid rgba(245,158,11,0.4);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .abc-item.active .abc-check {
+    background: var(--amber);
+    border-color: var(--amber);
+  }
+
+  .abc-check-mark {
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .abc-item.active .abc-check-mark { opacity: 1; transform: scale(1); }
+
+  .abc-item-label { font-size: 12px; color: var(--text-dim); line-height: 1.3; }
+
+  .abc-result {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.03);
+    border: 1px solid var(--border);
+    transition: all 0.4s;
+  }
+
+  .abc-result.alert {
+    background: rgba(239,68,68,0.1);
+    border-color: rgba(239,68,68,0.35);
+  }
+
+  .abc-score-num {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-muted);
+    transition: color 0.3s;
+    line-height: 1;
+  }
+
+  .abc-result.alert .abc-score-num { color: var(--red); }
+
+  .abc-score-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    transition: color 0.3s;
+  }
+
+  .abc-result.alert .abc-score-label { color: #b91c1c; }
+
+  /* DRUGS */
+  .drugs-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+
+  .drug-pill {
+    background: rgba(99,102,241,0.1);
+    border: 1px solid rgba(99,102,241,0.25);
+    border-radius: 100px;
+    padding: 7px 14px;
+    font-size: 12px;
+    color: #a5b4fc;
+    font-family: var(--mono);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .drug-pill .drug-icon { font-size: 14px; }
+
+  /* efast table */
+  .efast-table { width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+
+  .efast-table th {
+    background: var(--surface2);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 11px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  .efast-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    vertical-align: top;
+    line-height: 1.5;
+    font-size: 13px;
+  }
+
+  .efast-table tr:last-child td { border-bottom: none; }
+  .efast-table tr:nth-child(even) td { background: rgba(0,0,0,0.03); }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-family: var(--mono);
+    font-weight: 500;
+  }
+
+  .tag-pos { background: rgba(239,68,68,0.15); color: #b91c1c; border: 1px solid rgba(239,68,68,0.25); }
+  .tag-neg { background: rgba(100,116,139,0.12); color: var(--text-muted); border: 1px solid var(--border); }
+  .tag-stable { background: rgba(16,185,129,0.12); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.2); }
+  .tag-unstable { background: rgba(239,68,68,0.12); color: #b91c1c; border: 1px solid rgba(239,68,68,0.2); }
+  .tag-action { background: rgba(99,102,241,0.12); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.2); font-weight: 600; }
+
+  /* METAS */
+  .metas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .meta-card {
+    border-radius: 14px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .meta-card.sin-tec {
+    background: rgba(59,130,246,0.04);
+    border-color: rgba(59,130,246,0.2);
+  }
+
+  .meta-card.con-tec {
+    background: rgba(239,68,68,0.04);
+    border-color: rgba(239,68,68,0.2);
+  }
+
+  .meta-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .meta-card.sin-tec .meta-label { color: #1d4ed8; }
+  .meta-card.con-tec .meta-label { color: #b91c1c; }
+
+  .meta-value {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+
+  .meta-note { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+  .meta-tag {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 100px;
+  }
+
+  .sin-tec .meta-tag { background: rgba(59,130,246,0.15); color: #1d4ed8; }
+  .con-tec .meta-tag { background: rgba(239,68,68,0.15); color: #b91c1c; }
+
+  /* RESUMEN */
+  .resumen-box {
+    background: var(--surface2);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 14px;
+    padding: 20px;
+  }
+
+  .resumen-script {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.8;
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .fill-blank {
+    display: inline-block;
+    background: rgba(99,102,241,0.1);
+    border-bottom: 1.5px solid rgba(99,102,241,0.4);
+    border-radius: 3px;
+    padding: 1px 8px;
+    color: #a5b4fc;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-style: normal;
+    min-width: 60px;
+    cursor: text;
+    outline: none;
+    transition: background 0.2s;
+  }
+
+  .fill-blank:focus, .fill-blank:not(:empty) {
+    background: rgba(99,102,241,0.18);
+    border-bottom-color: #6366f1;
+    color: #c4b5fd;
+  }
+
+  .resumen-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* WARNING */
+  .warning-banner {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: rgba(239,68,68,0.04);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: #b91c1c;
+    line-height: 1.5;
+  }
+
+  .info-banner {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: rgba(245,158,11,0.04);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+    color: #b45309;
+    line-height: 1.5;
+    font-family: var(--mono);
+  }
+
+  /* REFERENCES */
+  .references-footer {
+    margin-top: 20px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    padding: 16px 20px;
+    animation: fadeUp 0.5s ease 0.7s both;
+  }
+
+  .references-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .references-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .references-list { display: flex; flex-direction: column; gap: 5px; }
+
+  .ref-item {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    padding-left: 14px;
+    position: relative;
+  }
+
+  .ref-item::before { content: '·'; position: absolute; left: 0; color: var(--red); }
+
+  .ref-item a { color: #2563eb; text-decoration: none; }
+  .ref-item a:hover { text-decoration: underline; }
+
+  .footer {
+    margin-top: 20px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 100px; }
+
+  @media (max-width: 600px) {
+    .wrapper { padding: 32px 16px 60px; }
+    .section-body { padding: 16px; }
+    .section-header { padding: 16px; }
+    .abc-items { grid-template-columns: 1fr; }
+    .metas-grid { grid-template-columns: 1fr; }
+    .roles-grid { grid-template-columns: 1fr; }
+    .efast-table th, .efast-table td { padding: 9px 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="huap-logo-wrap">
+      <img src="data:image/png;base64,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" alt="Logo HUAP" width="64" height="64" style="border-radius:50%; flex-shrink:0;"/>
+    </div>
+
+    <h1>Checklist <span>Reanimación</span><br>en Politrauma</h1>
+
+  </div>
+
+  <!-- S1: ROLES -->
+  <div class="section s1" id="s1">
+    <div class="section-header" onclick="toggleSection('s1')">
+      <span class="section-num">01</span>
+      <div>
+        <div class="section-title">Asignación de Roles</div>
+        <div class="section-subtitle">Equipo de 6 personas · Definir antes de recibir al paciente</div>
+      </div>
+      <svg class="section-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div class="section-body">
+      <div class="roles-grid">
+        <div class="role-card">
+          <div class="role-name">
+            <div class="role-icon" style="background:rgba(239,68,68,0.15)">👑</div>
+            Líder
+          </div>
+          <div class="role-desc">Toma de decisiones clínicas, define metas de presión y dirige el Resumen de Salida.</div>
+        </div>
+        <div class="role-card">
+          <div class="role-name">
+            <div class="role-icon" style="background:rgba(59,130,246,0.15)">🫁</div>
+            Vía Aérea
+          </div>
+          <div class="role-desc">Manejo de oxigenación, succión y asiste intubación/ventilación.</div>
+        </div>
+        <div class="role-card">
+          <div class="role-name">
+            <div class="role-icon" style="background:rgba(16,185,129,0.15)">🔊</div>
+            Ecografista
+          </div>
+          <div class="role-desc">Ejecución exclusiva del e-FAST: ventanas pleurales y abdominales.</div>
+        </div>
+        <div class="role-card">
+          <div class="role-name">
+            <div class="role-icon" style="background:rgba(245,158,11,0.15)">📊</div>
+            Monitorización
+          </div>
+          <div class="role-desc">Constantes cada 3 min, temperatura continua, vigilancia de metas PAM/PAS y registro de HGT.</div>
+        </div>
+        <div class="role-card" style="grid-column: span 2;">
+          <div class="role-name">
+            <div class="role-icon" style="background:rgba(99,102,241,0.15)">💉</div>
+            Circulación ×2
+          </div>
+          <div class="role-desc">Accesos vasculares, toma de muestras, administración de PTM, TXA y Calcio.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S2: xABCDE -->
+  <div class="section s2" id="s2">
+    <div class="section-header" onclick="toggleSection('s2')">
+      <span class="section-num">02</span>
+      <div>
+        <div class="section-title">Evaluación xABCDE</div>
+        <div class="section-subtitle">Secuencia de evaluación primaria.</div>
+      </div>
+      <span class="section-check-count" id="count-s2">0/6</span>
+      <svg class="section-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div class="section-body">
+      <div class="checklist" id="list-s2">
+
+        <div class="check-item" onclick="toggle(this, 's2')" data-total="6">
+          <div class="checkbox"><svg class="checkmark" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="check-label"><strong>[X] Exanguinación:</strong> Control de hemorragias externas catastróficas.</em></div>
+        </div>
+
+        <div class="check-item" onclick="toggle(this, 's2')" data-total="6">
+          <div class="checkbox"><svg class="checkmark" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="check-label"><strong>[A] Vía Aérea:</strong> Permeabilidad + Control cervical</div>
+        </div>
+
+        <div class="check-item" onclick="toggle(this, 's2')" data-total="6">
+          <div class="checkbox"><svg class="checkmark" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="check-label"><strong>[B] Ventilación:</strong> Auscultación bilateral + e-FAST Pleural</div>
+        </div>
+
+        <div class="check-item" onclick="toggle(this, 's2')" data-total="6">
+          <div class="checkbox"><svg class="checkmark" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="check-label"><strong>[C] Circulación:</strong> Calcular Score ABC → activar PTM si ≥2. Administrar <strong>TXA 2g IV bolo</strong> (dentro de 3 h del trauma) + <strong>Gluconato de Calcio 1g IV (si PTM).</strong></div>
+        </div>
+
+        <div class="check-item" onclick="toggle(this, 's2')" data-total="6">
+          <div class="checkbox"><svg class="checkmark" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="check-label"><strong>[D] Déficit Neurológico:</strong> Glasgow-P + HGT.</div>
+        </div>
+
+        <div class="check-item" onclick="toggle(this, 's2')" data-total="6">
+          <div class="checkbox"><svg class="checkmark" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="check-label"><strong>[E] Exposición:</strong> Búsqueda de lesiones ocultas + Prevención de hipotermia.</div>
+        </div>
+
+      </div>
+
+      <!-- ABC SCORE CALCULATOR -->
+      <div style="margin-top:20px;">
+        <div class="abc-box">
+          <div class="abc-title">🩸 Score ABC — Activación de PTM</div>
+          <div class="abc-items">
+            <div class="abc-item" onclick="toggleABC(this)" id="abc1">
+              <div class="abc-check"><svg class="abc-check-mark" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="abc-item-label">Mecanismo <strong>Penetrante</strong></div>
+            </div>
+            <div class="abc-item" onclick="toggleABC(this)" id="abc2">
+              <div class="abc-check"><svg class="abc-check-mark" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="abc-item-label"><strong>PAS ≤ 90</strong> mmHg</div>
+            </div>
+            <div class="abc-item" onclick="toggleABC(this)" id="abc3">
+              <div class="abc-check"><svg class="abc-check-mark" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="abc-item-label"><strong>FC ≥ 120</strong> lpm</div>
+            </div>
+            <div class="abc-item" onclick="toggleABC(this)" id="abc4">
+              <div class="abc-check"><svg class="abc-check-mark" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="abc-item-label">e-FAST <strong>Positivo</strong></div>
+            </div>
+          </div>
+          <div class="abc-result" id="abcResult">
+            <div class="abc-score-num" id="abcNum">0</div>
+            <div class="abc-score-label" id="abcLabel">Score ABC = 0 · PTM no indicada por criterio numérico</div>
+          </div>
+        </div>
+
+        <div class="drugs-row">
+          <div class="drug-pill"><span class="drug-icon">💉</span> TXA 2g IV · bolo único · ≤ 3h post-trauma</div>
+          <div class="drug-pill"><span class="drug-icon">🧪</span> Gluconato Ca²⁺ 1g IV</div>
+          <div class="drug-pill" style="background:rgba(239,68,68,0.04);border-color:rgba(239,68,68,0.2);color:#fca5a5;"><span class="drug-icon">🩸</span> PTM si Score ABC ≥ 2</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S3: efast -->
+  <div class="section s3" id="s3">
+    <div class="section-header" onclick="toggleSection('s3')">
+      <span class="section-num">03</span>
+      <div>
+        <div class="section-title">Protocolo e-FAST y Conducta</div>
+        <div class="section-subtitle">Decisiones según hallazgo + estado hemodinámico</div>
+      </div>
+      <svg class="section-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div class="section-body">
+      <table class="efast-table">
+        <thead>
+          <tr>
+            <th>Hallazgo e-FAST</th>
+            <th>Estado Hemodinámico</th>
+            <th>Conducta Inmediata</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-pos">Positivo (+)</span></td>
+            <td><span class="tag tag-unstable">Inestable</span> PAS &lt;90 / PAM &lt;60</td>
+            <td><span class="tag tag-action">PABELLÓN DIRECTO</span><br><span style="font-size:12px;color:var(--text-muted)">Laparotomía de control de daños</span></td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-pos">Positivo (+)</span></td>
+            <td><span class="tag tag-stable">Estable</span></td>
+            <td><span class="tag tag-action">TAC CUERPO COMPLETO</span><br><span style="font-size:12px;color:var(--text-muted)">Pan-TAC</span></td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-neg">Negativo (–)</span></td>
+            <td><span class="tag tag-unstable">Inestable</span></td>
+            <td style="color:var(--text-dim)">Buscar foco pélvico, retroperitoneal o en extremidades</td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-pos">Positivo (+)</span></td>
+            <td>PCR <5 minutos</td>
+            <td><span class="tag tag-action">TORACOTOMÍA RESUCITATIVA</span><br><span style="font-size:12px;color:var(--text-muted)">Toracostomía digital bilateral</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- S4: METAS -->
+  <div class="section s4" id="s4">
+    <div class="section-header" onclick="toggleSection('s4')">
+      <span class="section-num">04</span>
+      <div>
+		  <div class="section-title">Metas presoras en caso de TEC</div>
+      </div>
+      <span class="section-check-count" id="count-s4">0/2</span>
+      <svg class="section-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div class="section-body">
+      <div class="metas-grid" style="margin-bottom:16px;">
+        <div class="meta-card sin-tec">
+          <span class="meta-tag">Escenario A</span>
+          <div class="meta-label">Sin TEC</div>
+          <div class="meta-value">PAS 80–90</div>
+        </div>
+        <div class="meta-card con-tec">
+          <span class="meta-tag">Escenario B</span>
+          <div class="meta-label">Con TEC asociado</div>
+          <div class="meta-value">PAS ≥ 110</div>
+        </div>
+      </div>
+      <div class="checklist" id="list-s4">
+        <div class="check-item" onclick="toggle(this, 's4')" data-total="2">
+          <div class="checkbox"><svg class="checkmark" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="check-label">Se confirmó presencia o ausencia de <strong>TEC asociado</strong></div>
+        </div>
+        <div class="check-item" onclick="toggle(this, 's4')" data-total="2">
+          <div class="checkbox"><svg class="checkmark" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="check-label"><strong>Meta de PAS definida y comunicada</strong> al equipo por el Líder</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S5: RESUMEN -->
+  <div class="section s5" id="s5">
+    <div class="section-header" onclick="toggleSection('s5')">
+      <span class="section-num">05</span>
+      <div>
+        <div class="section-title">Resumen de Salida</div>
+        <div class="section-subtitle">El Líder verbaliza antes del traslado</div>
+      </div>
+      <span class="section-check-count" id="count-s5">0/2</span>
+      <svg class="section-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div class="section-body">
+      <div class="resumen-box">
+        <div class="resumen-script">
+          "Equipo, cerramos evaluación: Paciente de
+          <span class="fill-blank" contenteditable="true" data-placeholder="__ años">__ años</span>,
+          trauma por <span class="fill-blank" contenteditable="true" data-placeholder="mecanismo">___</span>,
+          con Score ABC de <span class="fill-blank" contenteditable="true" data-placeholder="0-4">___</span>.
+          Estamos con <span class="fill-blank" contenteditable="true" data-placeholder="PTM/Cristaloides">___</span>,
+          administrados 2g de TXA y 1g de Calcio (si corresponde).
+          Ecografista reporta e-FAST <span class="fill-blank" contenteditable="true" data-placeholder="(+)/(-)">___</span>
+          en <span class="fill-blank" contenteditable="true" data-placeholder="hallazgo">___</span>.
+          Se confirma que, al
+          <span class="fill-blank" contenteditable="true" data-placeholder="tener/no tener">___</span>
+          TEC asociado, la meta es PAS
+          <span class="fill-blank" contenteditable="true" data-placeholder="80-90 / ≥110">___</span>,
+          actualmente en <span class="fill-blank" contenteditable="true" data-placeholder="valor">___</span>.
+          Con antibióticos (si corresponde) y analgesia, trasladamos a
+          <span class="fill-blank" contenteditable="true" data-placeholder="destino">___</span>.
+          ¿Observaciones del equipo?"
+        </div>
+        <div class="resumen-hint">✏️ Haz clic en los espacios azules para completar el resumen</div>
+      </div>
+
+      <div class="checklist" id="list-s5" style="margin-top:14px;">
+        <div class="check-item" onclick="toggle(this, 's5')" data-total="2">
+          <div class="checkbox"><svg class="checkmark" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="check-label"><strong>Resumen verbalizado</strong> en voz alta por el Líder</div>
+        </div>
+        <div class="check-item" onclick="toggle(this, 's5')" data-total="2">
+          <div class="checkbox"><svg class="checkmark" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="check-label"><strong>Equipo confirmó</strong> — sin observaciones pendientes. Traslado autorizado.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESS BAR BOTTOM -->
+  <div class="progress-bottom">
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+    <div class="progress-label"><span id="progress-pct">0%</span> completado</div>
+    <button class="reset-btn" onclick="resetAll()">↺ Reiniciar</button>
+  </div>
+
+  <div class="status-badge" id="statusBadge">
+    ✓ &nbsp; Checklist completo — Equipo listo para traslado
+  </div>
+
+  <!-- REFERENCES -->
+  <div class="references-footer">
+    <div class="references-title">Referencias</div>
+    <div class="references-list">
+      <div class="ref-item">American College of Surgeons. <em>ATLS: Advanced Trauma Life Support, 11th Edition.</em> ACS Committee on Trauma. 2025. — Introduce xABCDE, hipotensión permisiva y reducción de cristaloides.</div>
+      <div class="ref-item">Rossaint R, et al. <em>The European Guideline on Management of Major Bleeding and Coagulopathy Following Trauma: Sixth Edition.</em> Crit Care. 2023;27(1):80. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9977110/" target="_blank">PMC9977110</a></div>
+      <div class="ref-item">Brain Trauma Foundation. <em>Guidelines for the Management of Severe Traumatic Brain Injury, 5th Edition.</em> 2024. — Umbral PAS ≥110 mmHg en TEC para protección cerebral.</div>
+      <div class="ref-item">Nunez TC, et al. <em>Early prediction of massive transfusion in trauma: simple as ABC.</em> J Trauma. 2009;66(2):346–352. — Derivación y validación del Score ABC (corte ≥2).</div>
+      <div class="ref-item">Cotton BA, et al. <em>Multicenter validation of a simplified score to predict massive transfusion in trauma.</em> J Trauma. 2010;69(suppl 1):S33–S39.</div>
+      <div class="ref-item">CRASH-2 Collaborators. <em>Effects of tranexamic acid on death, vascular occlusive events, and blood transfusion in trauma.</em> Lancet. 2010;376:23–32. — Base para TXA en trauma hemorrágico; máximo beneficio ≤1h, eficaz hasta 3h.</div>
+      <div class="ref-item">Rowell SE, et al. <em>Effect of Out-of-Hospital Tranexamic Acid vs Placebo on 6-Month Functional Neurologic Outcomes in Patients With Moderate or Severe TBI (PATCH-Trauma).</em> JAMA. 2023;329(12):1003–1016. — Evidencia para dosis 2g en bolo único.</div>
+    </div>
+  </div>
+
+  <div class="footer">HUAP · Hospital de Urgencia Asistencia Pública · Solo uso clínico institucional · 2026</div>
+</div>
+
+<script>
+  const state = { s2: 0, s4: 0, s5: 0 };
+  const totals = { s2: 6, s4: 2, s5: 2 };
+  const TOTAL_CHECKS = 10;
+
+  function toggle(el, section) {
+    el.classList.toggle('checked');
+    state[section] = document.querySelectorAll(`#list-${section} .check-item.checked`).length;
+    updateCount(section);
+    updateProgress();
+  }
+
+  function updateCount(section) {
+    const el = document.getElementById(`count-${section}`);
+    if (!el) return;
+    const n = state[section], t = totals[section];
+    el.textContent = `${n}/${t}`;
+    if (n === t) {
+      el.style.background = 'rgba(5,150,105,0.12)';
+      el.style.borderColor = 'rgba(5,150,105,0.25)';
+      el.style.color = '#065f46';
+    } else {
+      el.style.background = '';
+      el.style.borderColor = '';
+      el.style.color = '';
+    }
+  }
+
+  function updateProgress() {
+    const total = state.s2 + state.s4 + state.s5;
+    const pct = Math.round((total / TOTAL_CHECKS) * 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progress-pct').textContent = pct + '%';
+    document.getElementById('statusBadge').classList.toggle('show', pct === 100);
+  }
+
+  function toggleSection(id) {
+    document.getElementById(id).classList.toggle('collapsed');
+  }
+
+  function resetAll() {
+    document.querySelectorAll('.check-item.checked').forEach(el => el.classList.remove('checked'));
+    document.querySelectorAll('.abc-item.active').forEach(el => el.classList.remove('active'));
+    state.s2 = 0; state.s4 = 0; state.s5 = 0;
+    ['s2','s4','s5'].forEach(s => updateCount(s));
+    updateProgress();
+    updateABC();
+    document.querySelectorAll('.fill-blank').forEach(el => {
+      el.textContent = el.dataset.placeholder || '___';
+    });
+  }
+
+  // ABC SCORE
+  function toggleABC(el) {
+    el.classList.toggle('active');
+    updateABC();
+  }
+
+  function updateABC() {
+    const score = document.querySelectorAll('.abc-item.active').length;
+    const numEl = document.getElementById('abcNum');
+    const labelEl = document.getElementById('abcLabel');
+    const resultEl = document.getElementById('abcResult');
+    numEl.textContent = score;
+    if (score >= 2) {
+      resultEl.classList.add('alert');
+      labelEl.textContent = `Score ABC = ${score} · ⚠️ ACTIVAR PROTOCOLO TRANSFUSIÓN MASIVA`;
+    } else {
+      resultEl.classList.remove('alert');
+      labelEl.textContent = `Score ABC = ${score} · PTM no indicada por criterio numérico`;
+    }
+  }
+
+  // Fill blanks: clear placeholder on focus
+  document.querySelectorAll('.fill-blank').forEach(el => {
+    if (el.textContent.trim() === el.dataset.placeholder || el.textContent.includes('__')) {
+      el.style.color = 'rgba(165,180,252,0.4)';
+    }
+    el.addEventListener('focus', function() {
+      if (this.textContent.trim() === this.dataset.placeholder || this.textContent.includes('__')) {
+        this.textContent = '';
+        this.style.color = '#c4b5fd';
+      }
+    });
+    el.addEventListener('blur', function() {
+      if (!this.textContent.trim()) {
+        this.textContent = this.dataset.placeholder || '___';
+        this.style.color = 'rgba(165,180,252,0.4)';
+      }
+    });
+  });
+</script>
+</body>
+</html>
